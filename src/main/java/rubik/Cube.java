@@ -1,4 +1,4 @@
-package com.java.Rubik;
+package rubik;
 
 import java.util.EnumMap;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.java.Rubik;
+package rubik;
 
 enum SideDirection {
     TOP,
