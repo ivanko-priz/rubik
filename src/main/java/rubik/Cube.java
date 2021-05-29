@@ -48,7 +48,7 @@ public class Cube {
         EnumMap<SideDirection, Integer> s;
         int adjacentSide;
 
-        if (this.edges.size() >= currentSide) {
+        if (this.edges.size() > currentSide) {
             s = this.edges.get(currentSide);
 
             if (s.containsKey(d)) {
