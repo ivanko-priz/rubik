@@ -71,7 +71,7 @@ public class Cube {
     public void rotate(int side, int layer, int n, boolean clockWise) throws Exception {
         if (side < 0 || side > 5) throw new Exception("Side must be between 0 and 5");
         if (layer < 0 || layer >= Math.sqrt(this.size)) throw new Exception("Layer must be in range");
-        if (n <= 0) throw new Exception("Number of times must be greater than 0");
+        if (n <= 0) throw new Exception("Number of rotations must be greater than 0");
 
         int fullRotations = n % 4;
         
@@ -223,6 +223,10 @@ public class Cube {
         }
 
         System.out.println();
+    }
+
+    public char[] getCells() {
+        return this.cells;
     }
 
 }
