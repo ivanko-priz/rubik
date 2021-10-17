@@ -1,21 +1,22 @@
 package rubik;
 
 import java.util.EnumMap;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Cube {
     private char[] cells;
     private final char[] colors = {'r', 'g', 'b', 'w', 'o', 'y'};
     private final int size;
     private final int sizeSqrt;
-    private ArrayList<EnumMap<SideDirection, Integer>> edges;
+    private Map<Integer, EnumMap<SideDirection, Integer>> edges;
 
     Cube() {
         this.size = 9;
         this.sizeSqrt = (int) Math.sqrt(this.size);
         this.cells = new char[54];
-        this.edges = new ArrayList<>();
-        
+        this.edges = new HashMap<>();
+
         for (int i = 0; i < this.cells.length; i++) {
             this.cells[i] = this.colors[i / 9];
         }
@@ -30,36 +31,49 @@ public class Cube {
             m = new EnumMap<>(SideDirection.class);
             m.put(SideDirection.TOP, 1);
             m.put(SideDirection.RIGHT, 2);
-            this.edges.add(m.clone());
+            this.edges.put(0, m.clone());
 
             m = new EnumMap<>(SideDirection.class);
             m.put(SideDirection.RIGHT, 0);
             m.put(SideDirection.TOP, 2);
-            this.edges.add(m.clone());
+            this.edges.put(1, m.clone());
 
             m = new EnumMap<>(SideDirection.class);
             m.put(SideDirection.TOP, 0);
             m.put(SideDirection.RIGHT, 1);
-            this.edges.add(m.clone());
+            this.edges.put(2, m.clone());
         }
     }
+
 
     private int getAdjacentSide(int currentSide, SideDirection d) {
         EnumMap<SideDirection, Integer> s;
         int adjacentSide;
 
-        if (this.edges.size() > currentSide) {
+        if (this.edges.containsKey(currentSide)) {
             s = this.edges.get(currentSide);
 
             if (s.containsKey(d)) {
                 adjacentSide = s.get(d);
-            } else {
-                adjacentSide = this.getOppositeSide(s.get(d.getOpposite()));
+            } else  {
+                if (!s.containsKey(d.getOpposite())) {
+                    adjacentSide = this.getAdjacentSide(this.getOppositeSide(currentSide), d.getOpposite());
+                } else {
+                    adjacentSide = this.getOppositeSide(s.get(d.getOpposite()));
+                }
+
+                s.put(d, adjacentSide);
+
+                this.edges.put(currentSide, s);
             }
         } else {
             adjacentSide = this.getAdjacentSide(this.getOppositeSide(currentSide), d.getOpposite());
+            EnumMap<SideDirection, Integer> m = new EnumMap<>(SideDirection.class);
+            m.put(d, adjacentSide);
+
+            this.edges.put(currentSide, m);
         }
-        
+
         return adjacentSide;
     }
 
@@ -74,7 +88,7 @@ public class Cube {
         if (n <= 0) throw new Exception("Number of rotations must be greater than 0");
 
         int fullRotations = n % 4;
-        
+
         if (fullRotations != 0) {
             if (layer == this.sizeSqrt - 1) {
                 rotate(getOppositeSide(side), 0, n, !clockWise);
@@ -82,12 +96,12 @@ public class Cube {
                 if (!clockWise) {
                     fullRotations = 4 - fullRotations;
                 }
-        
+
                 if (layer == 0) {
                     // rotate side
                     rotateClockWise(side, fullRotations);
                 }
-        
+
                 // rotate adjacent sides
                 rotateAdjacentSidesClockwise(side, fullRotations, layer);
             }
